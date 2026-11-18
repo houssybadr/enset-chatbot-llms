@@ -1,179 +1,169 @@
-ENSET · Travaux pratiques · 18 novembre 2026
+Amélioration et évaluation d’un chatbot basé sur des LLMs locaux
 
-Amélioration et évaluation d'un chatbot basé sur des LLMs locaux
+Compte rendu de travaux pratiques
 
-Houssy Badr · Enseignant : Pr. OUHMIDA
+ENSET
 
-1. Objectif et périmètre
+Réalisé par Houssy Badr
 
-Le travail prolonge le chatbot Streamlit fourni en conservant son titre, ses paramètres, l'historique de messages et le streaming Ollama. Le fichier initial est archivé sans modification dans original/ENSET_Chatbot.py. Les cinq améliorations demandées sont intégrées à la même application ; les modèles s'exécutent localement.
+Enseignant Pr OUHMIDA
 
-Amélioration | Réalisation
+18 novembre 2026
 
-Conversations | Nouvelle conversation, sélection de discussions de la session, suppression et exports TXT/JSON.
+1 Présentation du travail
 
-Comparaison | Une question, deux modèles installés distincts, paramètres identiques, réponses sur deux colonnes.
+Le point de départ de ce TP est une application Streamlit qui permet de discuter avec un modèle local. Le script fourni propose déjà le choix du modèle, les paramètres de génération et l’affichage progressif des réponses. J’ai repris cette base pour ajouter la gestion de plusieurs conversations, la comparaison de deux modèles et les mesures demandées dans le sujet.
 
-Performances | Durée, tokens, débit et TTFT ; tableaux et graphiques.
+Les essais portent sur Llama 3.2 et Qwen 0.5B. Sur les cinq questions retenues, Qwen répond plus vite et occupe moins de mémoire GPU. Ses réponses sont toutefois moins fiables pour le raisonnement, le code et la synthèse. Le rapport présente les résultats mesurés et les réponses qui permettent de faire ce constat.
 
-Ressources | CPU et RAM via psutil ; GPU et mémoire GPU via nvidia-smi lorsque disponible.
+Organisation de l’application
 
-Robustesse et ergonomie | Détection des modèles, service inaccessible, erreurs explicites et indicateur de génération. Interface française sobre.
+L’interface et les conversations restent dans ENSET_Chatbot.py. Les appels à Ollama et les mesures sont regroupés dans core.py. Le script experiment.py envoie les cinq questions aux deux modèles et enregistre les résultats. Le script de départ est conservé sans modification dans le dossier original.
 
-2. Architecture
+Lorsqu’une question est envoyée, l’interface appelle Ollama sur la machine. Les fragments reçus sont affichés au fur et à mesure. En parallèle, un suivi relève le CPU, la RAM et, lorsque cela est possible, le GPU. Les résultats sont ensuite ajoutés aux tableaux de l’application.
 
-ENSET_Chatbot.py gère l'interface, les conversations dans st.session_state, les exports et les deux modes. core.py partage la génération en streaming et les mesures entre l'interface et experiment.py. Un fil d'exécution échantillonne les ressources pendant l'appel Ollama. experiment.py exécute les cinq tâches et archive les réponses JSON, le tableau CSV, les conditions et les graphiques.
+L’application récupère la liste des modèles réellement installés. Si Ollama est inaccessible ou si la génération échoue, elle affiche un message d’erreur. Un indicateur reste visible pendant l’attente de la réponse. Les deux modes sont accessibles depuis la barre latérale.
 
-Flux : utilisateur → interface Streamlit → core.generate → service Ollama local → fragments de réponse et compteurs réels → affichage et mesures. Le changement de discussion conserve l'historique tant que la session reste ouverte ; le rechargement ou la fermeture de la session peut le perdre.
+2 Gestion des conversations
 
-3. Fonctionnalités en situation
+Le bouton « Nouvelle conversation » ouvre une discussion vide. Les discussions précédentes restent accessibles dans la liste de la session. Une conversation sélectionnée peut être supprimée ou téléchargée en TXT ou en JSON. Ces exports permettent de conserver son contenu après la fermeture de la session.
 
-Figure 1. Dialogue réel, choix du modèle, suppression et téléchargement TXT/JSON.
+Figure 1  Dialogue réel avec Qwen dans l’application
 
-![Figure 1. Dialogue réel, choix du modèle, suppression et téléchargement TXT/JSON.](captures/conversation.jpg)
+Figure 2  Commandes de création de suppression et d’export
 
-Figure 2. Deux conversations conservées et sélectionnables dans la même session.
+La figure 2 montre les deux formats d’export et le modèle utilisé. Les captures de cette partie illustrent des essais de l’interface. Les chiffres de l’étude comparative proviennent, eux, des dix observations enregistrées dans le dossier resultats.
 
-![Figure 2. Deux conversations conservées et sélectionnables dans la même session.](captures/historique.jpg)
+3 Comparaison et consultation de l’historique
 
-Les captures illustrent les essais fonctionnels de l'interface. Leurs mesures ne sont pas les dix observations du protocole comparatif : ce dernier est archivé séparément dans resultats/.
+Figure 3  Deux conversations conservées dans la même session
 
-4. Comparaison et surveillance
+La liste de la figure 3 permet de revenir à la première discussion après en avoir créé une seconde. Le contenu est conservé dans st.session_state, pendant la session Streamlit. Il n’y a pas de base de données de conversations.
 
-Figure 3. Même question envoyée aux deux modèles et réponses côte à côte.
+Figure 4  Question commune et réponses affichées sur deux colonnes
 
-![Figure 3. Même question envoyée aux deux modèles et réponses côte à côte.](captures/comparaison.jpg)
+Dans le mode comparaison, l’utilisateur choisit deux modèles distincts parmi ceux qui sont installés. La même question et les mêmes paramètres sont transmis aux deux modèles. Les générations se font l’une après l’autre pour limiter leur concurrence sur le matériel. La figure 4 montre un essai de traduction réalisé dans ce mode.
 
-Figure 4. Tableaux de performances et surveillance CPU, RAM, GPU et mémoire GPU.
+4 Matériel et protocole expérimental
 
-![Figure 4. Tableaux de performances et surveillance CPU, RAM, GPU et mémoire GPU.](captures/mesures.jpg)
+Ces informations figurent dans resultats/conditions.json. La capacité mémoire de la carte NVIDIA a été relevée avec nvidia-smi. Les valeurs de RAM exprimées en Go dans l’interface sont calculées sur une base de 1 024 et correspondent donc à des Gio.
 
-Les générations sont successives pour limiter la concurrence entre modèles. La présence de deux modèles en mémoire pendant l'utilisation interactive peut affecter les ressources ; l'étude décharge le modèle précédent avant la série suivante.
+Le nom Qwen 0.5B est celui du sujet et de l’étiquette installée. Ollama annonce 620 millions de paramètres pour ce fichier. Les deux modèles n’ont ni la même taille ni la même quantification ; la comparaison décrit donc ces versions précises.
 
-L'essai interactif de la figure 3 ajoute une contrainte de deux phrases et utilise les paramètres de l'interface : Llama y répond 4 DH, ce qui est faux (réponse correcte : 2 DH). Il réussit la question du corpus mesuré avec une autre formulation. Cette différence illustre la sensibilité au prompt et à la génération ; les captures ne doivent pas être confondues avec le protocole du tableau.
+Les réglages sont identiques : température de 0,7, top-k de 40, top-p de 0,9, maximum de 512 tokens, contexte de 2 048 tokens et graine fixée à 42. Chaque question est envoyée dans un contexte neuf. Un échauffement précède chaque série, puis le modèle précédent est déchargé avant de passer au suivant.
 
-5. Conditions expérimentales
+J’ai retenu cinq tâches : expliquer la différence entre RAM et stockage, résoudre un petit problème de prix, écrire une fonction Python, résumer un texte et traduire une phrase. Les formulations exactes apparaissent dans les captures des réponses. Chaque question a été exécutée une fois par modèle, dans le même ordre, Llama avant Qwen.
 
-Mesures effectuées le 18 novembre 2026 sur Windows 10 (build 19045), avec un AMD Ryzen 5 5600H, 6 cœurs / 12 processeurs logiques, 15,35 Gio de RAM utilisable et une NVIDIA GeForce RTX 3060 Laptop GPU de 6 144 Mio. Un GPU AMD Radeon intégré est également présent. La capacité NVIDIA est vérifiée avec nvidia-smi ; le champ AdapterRAM de Windows peut être tronqué à 4 Gio et n'est pas utilisé pour cette capacité.
+Lecture des mesures
 
-Modèles : llama3.2:latest, 3,2 milliards de paramètres, et qwen:0.5b, environ 0,5 milliard. Les étiquettes, empreintes et quantifications exactes sont conservées dans conditions.json. Paramètres communs : température 0,7 ; top-k 40 ; top-p 0,9 ; maximum 512 tokens ; graine 42 ; contexte 2 048 tokens. Aucun historique n'est partagé entre les questions.
+Le temps de réponse va du début de l’appel à la fin du flux. Le TTFT correspond à l’attente avant le premier fragment de texte reçu. Le nombre de tokens vient du compteur eval_count d’Ollama. Le débit est calculé en divisant ce nombre par eval_duration converti en secondes. Il porte sur la génération, alors que le temps total comprend aussi le traitement de la question.
 
-Un échauffement précède chaque série. Le chargement initial est exclu des cinq mesures. Chaque question est exécutée une seule fois par modèle, dans le même ordre. Llama passe avant Qwen, puis est déchargé. Les applications habituelles du poste restent présentes. Ces conditions correspondent à un essai exploratoire, pas à un benchmark statistiquement représentatif.
+5 Temps de réponse observés
 
-Tâche | Question exacte
+Tableau 1  Les dix générations mesurées le 18 novembre 2026
 
-Concept | Explique en français la différence entre RAM et stockage en trois phrases.
+Figure 5  Durée totale de chaque réponse après échauffement
 
-Raisonnement | Un livre et un stylo coûtent 22 dirhams. Le livre coûte 18 dirhams de plus que le stylo. Quel est le prix du stylo ? Explique brièvement.
+Qwen a le temps le plus faible pour chacune des cinq questions. Sa moyenne est de 0,364 s, contre 1,048 s pour Llama. L’écart change selon la tâche : il est d’environ 1,33 s pour le raisonnement, mais de 0,10 s pour la traduction. Les réponses ne sont pas toutes aussi longues ni aussi pertinentes, ce qui compte dans l’interprétation de ces durées.
 
-Code Python | Écris une fonction Python est_palindrome(texte) qui ignore les espaces et la casse. Donne deux exemples de test.
+6 Débit et attente du premier fragment
 
-Synthèse | Résume en deux phrases : Une école installe des panneaux solaires pour réduire sa facture. Les travaux dureront trois mois. Les cours continueront pendant les travaux. Les économies financeront du matériel pédagogique.
+Figure 6  Vitesse de génération calculée avec les compteurs Ollama
 
-Traduction | Traduis uniquement en anglais : Les étudiants travaillent ensemble pour concevoir une application simple et utile.
+Qwen produit en moyenne 395,9 tokens par seconde, contre 118,9 pour Llama. Il est donc environ 3,3 fois plus rapide sur cet indicateur. Ces valeurs sont les moyennes des cinq débits. Un débit élevé renseigne sur la vitesse du modèle, mais ne permet pas de juger si sa réponse résout la question.
 
-Définition des indicateurs
+Figure 7  Délai avant le premier fragment de texte reçu
 
-Temps : durée entre l'appel client et la fin du flux. TTFT : délai avant le premier fragment de texte non vide reçu, approximation côté client du premier token. Tokens : eval_count fourni par Ollama. Débit : eval_count / (eval_duration / 10^9), calculé sur la seule génération, sans chargement ni traitement du prompt. CPU : pourcentage global sur 0,1 seconde. RAM : mémoire physique utilisée par le système. GPU : première carte NVIDIA interrogée par nvidia-smi.
+Le premier fragment arrive en moyenne après 0,098 s pour Qwen et 0,126 s pour Llama. L’écart est moins marqué que pour le débit. Ces mesures ont été prises après échauffement. Lors d’un premier appel à un modèle déchargé, il faut aussi attendre son chargement ; les captures fonctionnelles peuvent donc afficher un temps supérieur à celui de cette série.
 
-Les échantillons de ressources sont espacés d'au moins 0,4 s, auxquels s'ajoutent les coûts de mesure. Les réponses très courtes, notamment de Qwen, ne donnent qu'un échantillon : leurs moyennes et pics peuvent donc être identiques. Les pics réels peuvent être manqués. Les unités Go/Mo de l'interface correspondent ici à des Gio/Mio.
+Les dix valeurs sont lisibles dans le tableau 1 et dans le fichier mesures.csv. La capture de la figure 16, en fin de rapport, montre également leur lecture à partir des données archivées.
 
-6. Résultats de performance
+7 Utilisation des ressources
 
-Tâche | Modèle | Temps (s) | Tokens | Tokens/s | TTFT (s)
+Tableau 2  Moyenne des cinq observations pour chaque modèle
 
-Concept | Llama 3.2 | 1.573 | 155 | 116.6 | 0.127
+Figure 8  Comparaison des pics de mémoire relevés pendant les réponses
 
-Raisonnement | Llama 3.2 | 1.763 | 176 | 116.2 | 0.129
+L’écart le plus net concerne la mémoire GPU : le pic moyen est d’environ 3 115 Mio pour Llama, contre 1 413 Mio pour Qwen. La RAM système est plus proche, avec environ 9,07 Gio contre 8,77 Gio. Ces chiffres incluent les autres logiciels présents sur le poste ; ils ne correspondent pas à la mémoire du seul modèle.
 
-Code Python | Llama 3.2 | 0.808 | 76 | 118.7 | 0.122
+Figure 9  Affichage du CPU de la RAM et du GPU dans l’application
 
-Synthèse | Llama 3.2 | 0.868 | 81 | 118.9 | 0.127
+Le CPU moyen relevé est plus élevé pour Qwen, à 26,2 % contre 14,6 %. Il faut rester prudent : plusieurs réponses de Qwen durent moins d’une demi-seconde et ne donnent qu’un seul échantillon. Le suivi espace les relevés d’au moins 0,4 s et mesure le CPU sur 0,1 s. Il peut manquer des pics. Ces valeurs ne suffisent donc pas pour comparer l’énergie consommée ou la charge totale des deux modèles.
 
-Traduction | Llama 3.2 | 0.227 | 12 | 124.2 | 0.123
+8 Explication de la RAM et du stockage
 
-Concept | Qwen 0.5B | 0.494 | 107 | 357.6 | 0.119
+La première question demande une explication en français, en trois phrases. La capture ci-dessous reproduit les réponses enregistrées lors de l’étude. Les vues de lecture des figures 10 à 12 et 14 à 16 utilisent directement reponses.json : elles permettent de consulter les textes d’origine sans relancer les modèles.
 
-Raisonnement | Qwen 0.5B | 0.435 | 105 | 405.3 | 0.095
+Figure 10  Réponses archivées à la question sur la RAM et le stockage
 
-Code Python | Qwen 0.5B | 0.507 | 135 | 398.9 | 0.091
+Llama distingue bien la mémoire temporaire du stockage persistant. Sa réponse respecte les trois phrases demandées. Une partie reste inexacte : le lancement d’une nouvelle tâche n’efface pas automatiquement les données de la RAM. L’explication est donc utilisable comme point de départ, mais cette phrase doit être corrigée.
 
-Synthèse | Qwen 0.5B | 0.255 | 52 | 419.5 | 0.093
+Qwen commence par deux phrases peu compréhensibles et insère des caractères chinois, puis termine en anglais. La dernière phrase exprime la différence entre temporaire et permanent, mais l’ensemble ne constitue pas une explication claire en français. Il a répondu en 0,494 s, contre 1,573 s pour Llama ; ici, le gain de temps s’accompagne d’une baisse nette de qualité.
 
-Traduction | Qwen 0.5B | 0.129 | 12 | 398.0 | 0.091
+9 Résolution du problème de prix
 
-Figure 5. Temps total par question, chargement initial exclu.
+Figure 11  Calcul de Llama et réponse hors sujet de Qwen dans le fichier archivé
 
-![Figure 5. Temps total par question, chargement initial exclu.](resultats/temps.png)
+Le stylo coûte 2 dirhams. Si son prix est x, celui du livre est x + 18. La somme donne 2x + 18 = 22, donc x = 2. La figure 11 montre que Llama suit ce calcul et arrive à la bonne valeur. Pour garder le calcul lisible, seule la fin de sa réponse est affichée dans cette vue ; la réponse complète reste dans le fichier source.
 
-Figure 6. Débit de génération calculé à partir des compteurs Ollama.
+Qwen parle de l’architecture et des performances d’un stylo, sans utiliser les deux prix du problème. Il ne donne pas de solution. Sa durée est pourtant quatre fois plus courte environ, à 0,435 s contre 1,763 s. Ce cas montre pourquoi la durée ne doit pas être utilisée seule pour choisir un modèle.
 
-![Figure 6. Débit de génération calculé à partir des compteurs Ollama.](resultats/vitesse.png)
+10 Génération de code Python
 
-7. Ressources et temps d'attente
+Figure 12  Fonctions et exemples proposés pour la question Python
 
-Modèle | CPU moyen (%) | RAM pic moyen (Gio) | GPU moyen (%) | VRAM pic moyen (Mio)
+Llama propose une fonction est_palindrome. Elle retire les espaces avec une expression régulière, transforme le texte en minuscules et le compare à son inverse. Cela répond à la consigne. Le premier exemple contient cependant un commentaire erroné : la chaîne « Madame, je suis une letrine. » n’est pas un palindrome, alors que le modèle annonce True.
 
-Llama 3.2 | 14.6 | 9.07 | 64.7 | 3115
+Qwen utilise le nom is_palindrome sans définir la fonction. Le bloc de code ne peut donc pas être exécuté tel quel. Il annonce aussi une valeur 1 sans la justifier et donne cinq textes d’exemple alors que deux tests étaient demandés. Sa réponse est plus longue en tokens que celle de Llama, mais elle reste incomplète.
 
-Qwen 0.5B | 26.2 | 8.77 | 48.4 | 1413
+11 Vérification de la fonction proposée
 
-Ce tableau présente la moyenne non pondérée des cinq observations par modèle. Les colonnes de pics représentent la moyenne des cinq maxima échantillonnés. Il ne s'agit pas de consommation attribuable exclusivement au processus Ollama.
+Figure 13  Exécution locale de la fonction de Llama sur quatre chaînes
 
-Figure 7. Pic de RAM système observé pendant chaque réponse.
+J’ai vérifié séparément la fonction de Llama sur deux palindromes, un mot ordinaire et la chaîne de son premier exemple. Elle renvoie les bonnes valeurs pour les trois premiers cas. Pour la dernière chaîne, elle renvoie False : l’erreur vient du commentaire généré, pas du mécanisme de comparaison utilisé par la fonction.
 
-![Figure 7. Pic de RAM système observé pendant chaque réponse.](resultats/ram.png)
+Cette vérification complète la lecture du code. Les résultats sont conservés dans rapport_assets/verification_code.json. Elle n’a pas servi à recalculer les temps du tableau 1, qui correspondent uniquement aux dix générations initiales.
 
-Figure 8. Délai jusqu'au premier fragment reçu côté client.
+Pour cette tâche, Llama est le meilleur des deux modèles testés, mais ses exemples doivent être exécutés avant d’être repris. Qwen ne fournit pas le code demandé. Une réponse rapide ou bien présentée ne dispense donc pas de vérifier qu’une fonction existe et qu’elle passe des tests simples.
 
-![Figure 8. Délai jusqu'au premier fragment reçu côté client.](resultats/ttft.png)
+12 Synthèse et traduction
 
-Llama occupe environ 3 115 Mio de VRAM au pic moyen contre 1 413 Mio pour Qwen, sur ce poste. La RAM système est d'environ 9,07 contre 8,77 Gio. Le CPU moyen observé est plus élevé pour Qwen (26,2 % contre 14,6 %), mais son échantillonnage est trop court pour conclure qu'il consomme davantage de CPU au total.
+Figure 14  Réponses archivées à la demande de synthèse en deux phrases
 
-8. Analyse critique des réponses
+Llama rassemble les informations dans deux phrases et conserve la durée des travaux ainsi que le maintien des cours. Il ajoute toutefois des formulations sur les perturbations de l’enseignement qui ne figurent pas explicitement dans le texte. Qwen recopie les quatre phrases du départ. Les informations restent présentes, mais la consigne de synthèse en deux phrases n’est pas respectée.
 
-Tâche | Llama 3.2 | Qwen 0.5B
+Figure 15  Traductions enregistrées pour la même phrase française
 
-Concept | Différence volatile/persistante comprise. Imprécision : lancer une nouvelle tâche n'efface pas automatiquement toute la RAM. | Réponse multilingue et phrases incohérentes ; la dernière phrase distingue toutefois temporaire et permanent.
+Les deux traductions restent compréhensibles et proches du sens demandé. Llama utilise « design » pour « concevoir », ce qui est plus direct que « develop », choisi par Qwen. Sur cette tâche courte, Qwen fournit une réponse acceptable en 0,129 s, contre 0,227 s pour Llama.
 
-Raisonnement | Équation correcte : x + (x + 18) = 22 ; stylo à 2 DH. | Ne résout pas le problème, produit des généralités hors sujet.
+13 Vérification des valeurs et limites de l’étude
 
-Code Python | Fonction correcte pour espaces/casse ; le premier exemple annoncé True est faux, la chaîne n'étant pas palindrome. | Ne définit aucune fonction ; appelle is_palindrome non définie, donne des résultats injustifiés.
+Figure 16  Lecture des dix mesures dans le fichier de résultats archivé
 
-Synthèse | Deux phrases avec les faits essentiels ; ajoute des formulations sur la minimisation des perturbations. | Recopie les quatre phrases au lieu d'une synthèse en deux phrases.
+La capture ci-dessus permet de retrouver les valeurs du tableau 1. Les graphiques sont calculés à partir de ces mêmes observations. Les arrondis servent seulement à rendre les tableaux lisibles ; les fichiers JSON et CSV gardent les valeurs mesurées.
 
-Traduction | Traduction fidèle et concise. | Traduction acceptable ; develop rend concevoir de manière légèrement plus libre.
+Le classement de vitesse est le même pour les cinq questions, mais cela ne prouve pas qu’il sera identique pour toutes les utilisations. Une seule génération a été réalisée pour chaque question et chaque modèle. L’ordre des modèles est fixe, et les autres logiciels du poste peuvent influencer les ressources relevées.
 
-Réponses aux cinq questions du TP
+Les compteurs Ollama donnent un débit de génération, tandis que le TTFT est mesuré du côté de l’application, au premier fragment reçu. Ce fragment peut contenir plusieurs tokens. Il s’agit donc d’une approximation du temps au premier token, et non d’une mesure interne du moteur.
 
-1. Temps le plus faible : Qwen dans les cinq tâches. La moyenne des durées est de 0,364 s contre 1,048 s pour Llama. Cette moyenne dépend aussi de la longueur et de la pertinence des réponses ; une réponse rapide mais incorrecte ne constitue pas une meilleure solution.
+Les essais de l’interface et la vérification du code ont été réalisés séparément. Ils illustrent les fonctionnalités ou vérifient une erreur précise ; ils ne remplacent pas les observations du protocole comparatif.
 
-2. Vitesse la plus élevée : Qwen, 395,9 tokens/s en moyenne contre 118,9 pour Llama, soit environ 3,3 fois le débit. Il s'agit d'une moyenne arithmétique des cinq débits, pas du total des tokens divisé par le temps total.
+14 Bilan et choix du modèle
 
-3. Ressources : Qwen présente une empreinte GPU nettement plus faible et une RAM système légèrement inférieure. Les usages CPU/GPU sont fluctuants et mesurés globalement ; les réponses très courtes ne permettent pas de comparer finement les charges ni l'énergie.
+Sur ce poste, Qwen 0.5B est le plus rapide des deux modèles. Il présente le temps de réponse le plus faible pour les cinq questions et le débit moyen le plus élevé. Son occupation de la mémoire GPU est aussi nettement plus faible. Ces résultats en font une option intéressante lorsque la mémoire disponible est limitée.
 
-4. Constance : le classement de vitesse reste le même dans les cinq questions, mais l'écart de temps change. Les durées dépendent du prompt et du nombre de tokens générés (12 à 176 ici). Un essai unique ne démontre pas une constance générale.
+Je le réserverais cependant à des tâches simples dont la réponse peut être vérifiée facilement. La traduction testée est acceptable, mais le raisonnement, le code et la synthèse montrent des limites importantes. Pour ces usages, Llama 3.2 offre des réponses plus utiles dans ce corpus, avec un coût mémoire plus élevé. Il reste nécessaire de contrôler ses explications et ses exemples Python.
 
-5. Machine limitée : parmi ces deux modèles, Qwen 0.5B convient lorsque la mémoire disponible est prioritaire et que les tâches restent simples, par exemple la traduction testée. Son échec sur raisonnement, code et synthèse impose une validation des réponses. Si les ressources le permettent, Llama 3.2 est préférable pour ces tâches variées, malgré son coût mémoire et son débit plus faible.
+Les écarts ne sont pas constants en valeur : ils changent avec la question et la longueur de la réponse. Le choix dépend donc de la tâche, de la mémoire disponible et du niveau d’erreur acceptable. Une série de tests répétée sur un corpus plus large serait nécessaire avant de tirer une recommandation générale.
 
-9. Validation et conclusion
+Vérifications de l’application
 
-Vérifications réalisées
+Les cinq tests fonctionnels de l’application passent. Ils couvrent la gestion des conversations et la présence des exports, l’envoi des mêmes paramètres aux deux modèles, une erreur de génération, l’absence de service Ollama et l’absence de modèles installés. Les réponses utilisées dans ces tests sont isolées des mesures expérimentales. Les captures de l’interface montrent également son exécution avec les modèles locaux.
 
-Les cinq tests fonctionnels automatisés passent : cycle des conversations et présence des deux exports ; même question et mêmes paramètres pour deux modèles distincts ; gestion d'une erreur de génération sans altérer l'historique ; message de service indisponible ; message d'absence de modèles. Les appels sont remplacés uniquement dans ces tests isolés. Ils n'alimentent jamais les résultats expérimentaux.
+Fichiers remis
 
-Les essais manuels dans le navigateur confirment un dialogue réel avec Qwen, la consultation d'une conversation conservée, l'affichage des deux réponses locales sur deux colonnes et les tableaux de mesures. Les captures jointes proviennent de l'application exécutée. Le script original est conservé à l'identique. Les installations, tests, expériences et génération du rapport sont réalisés dans le venv du projet.
+Le projet contient l’application, requirements.txt, les instructions d’installation, le script initial, les données expérimentales, les captures et ce rapport Word. Les consignes de remise sont conservées dans CONSIGNES_RAPPORT.md. Les environnements Python utilisés pour les essais et la préparation du rapport sont temporaires et sont nettoyés après vérification.
 
-Avantages, limites et conclusion
+Sources
 
-L'exécution locale permet de tester et comparer les modèles sans envoyer les questions à un service de génération distant. Le streaming, les conversations de session et les indicateurs rendent l'application plus utilisable et observable. Llama 3.2 donne ici des réponses généralement plus pertinentes, mais garde des erreurs factuelles et des exemples de tests inexacts. Qwen 0.5B est plus léger et plus rapide, mais ses capacités sont insuffisantes pour plusieurs tâches du corpus.
-
-La recommandation dépend donc de la mémoire disponible et de la qualité attendue. Les résultats ne doivent pas être généralisés à toutes les machines, variantes de Qwen, quantifications ou tailles de contexte. Cinq questions, un seul passage, l'ordre fixe des modèles et les charges du système limitent la portée de l'étude. Des répétitions et un ordre alterné seraient nécessaires pour estimer une variabilité ; ils ne sont pas présentés comme ayant été réalisés.
-
-Livrables et traçabilité
-
-Le dépôt contient le code organisé, requirements.txt, les instructions README, le script initial, les tests, les captures, ce rapport et les fichiers réels resultats/conditions.json, reponses.json et mesures.csv. Les graphiques sont calculés à partir de ces mêmes données. CONSIGNES_RAPPORT.md conserve les exigences de remise pour les prochaines sessions de travail.
-
-Références
-
-Sujet fourni : TP_Ameliorations_LLMs.pdf, Pr. OUHMIDA. Base fournie : ENSET_Chatbot.py. Documentation officielle Ollama, compteurs et durée en nanosecondes : https://github.com/ollama/ollama/blob/main/docs/api.md. Données primaires : fichiers resultats/ de cette étude, 18 novembre 2026.
+Sujet du TP de Pr OUHMIDA : TP_Ameliorations_LLMs.pdf. Script initial : ENSET_Chatbot.py. Mesures et réponses : resultats/conditions.json, resultats/mesures.csv et resultats/reponses.json, relevés le 18 novembre 2026. Documentation des compteurs Ollama : github.com/ollama/ollama/blob/main/docs/api.md.
