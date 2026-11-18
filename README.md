@@ -28,7 +28,7 @@ Cinq tâches : concept, raisonnement, code Python, synthèse et traduction. Les 
 - `core.py` : génération en streaming, durée, TTFT et échantillonnage matériel.
 - `experiment.py` : protocole reproductible et graphiques du rapport.
 - `original/ENSET_Chatbot.py` : base initiale inchangée.
-- `Rapport_TP_LLMs_Houssy_Badr.docx` : rapport technique à rendre, en Times New Roman et noir et blanc.
+- `Rapport_TP_LLMs_Houssy_Badr.docx` : rapport technique à rendre, en Times New Roman, avec captures de l’interface en couleur et mise en page en noir et blanc.
 - `rapport_assets/` : captures lisibles des fonctionnalités, preuves des analyses et graphiques du rapport.
 
 Le rapport à rendre est désormais **Rapport_TP_LLMs_Houssy_Badr.docx**. Il remplace la première version PDF. Les exigences de remise et les corrections de présentation sont conservées dans `CONSIGNES_RAPPORT.md`.
@@ -42,7 +42,7 @@ Le rapport à rendre est désormais **Rapport_TP_LLMs_Houssy_Badr.docx**. Il rem
 .venv\Scripts\python build_report_word.py
 ```
 
-Les cinq tests vérifient les conversations et exports, la comparaison avec paramètres identiques, les erreurs de génération, l'absence de service et l'absence de modèles. Leurs réponses de test sont isolées des données expérimentales. Le rapport distingue les captures de l'application, les captures de lecture des réponses archivées et la vérification supplémentaire du code. Chaque analyse de tâche renvoie aux réponses exactes dont elle parle. Les PNG utilisés dans Word sont en niveaux de gris ; les captures sources sont aussi conservées.
+Les cinq tests vérifient les conversations et exports, la comparaison avec paramètres identiques, les erreurs de génération, l'absence de service et l'absence de modèles. Leurs réponses de test sont isolées des données expérimentales. Le rapport distingue les captures de l'application, les captures de lecture des réponses archivées et la vérification supplémentaire du code. Chaque analyse de tâche renvoie aux réponses exactes dont elle parle. Les captures de l’interface sont en couleur ; les graphiques et les captures de lecture des résultats restent en niveaux de gris. Les captures sources sont aussi conservées.
 
 Étude effectuée le 18 novembre 2026 : cinq questions par modèle, après échauffement. Durées moyennes observées : Llama 3.2, 1,048 s ; Qwen 0.5B, 0,364 s. Qwen est plus rapide mais échoue sur plusieurs tâches ; consulter le rapport pour l'analyse et les limites. Ces chiffres ne sont pas une garantie pour une autre machine.
 

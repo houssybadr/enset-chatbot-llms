@@ -4,6 +4,8 @@ L'utilisateur doit rendre un rapport respectant `TP_Ameliorations_LLMs.pdf`.
 
 Correction demandée : livrer le rapport en Word (.docx), avec Times New Roman, texte noir et illustrations en niveaux de gris, une mise en page simple et une rédaction naturelle. Les captures doivent être nettes et correctement cadrées. Chaque analyse doit renvoyer à une preuve lisible : réponse enregistrée, mesure ou vérification. Les captures de lecture des données archivées doivent être identifiées comme telles, sans les présenter comme de nouvelles générations.
 
+Dernière précision : les captures de l’interface utilisateur doivent être en couleur. Le texte, les tableaux, les graphiques et les captures de lecture des résultats restent en noir et blanc.
+
 Le rapport doit présenter les cinq améliorations, l'architecture, des captures des fonctionnalités, le tableau et les graphiques comparatifs, une analyse critique et une conclusion sur avantages et limites. Préciser CPU, RAM, GPU disponible et conditions expérimentales.
 
 Comparer exactement Llama 3.2 et Qwen 0.5B sur au moins cinq questions : concept, raisonnement, Python, synthèse courte, traduction. Relever temps, tokens, tokens/s, TTFT réalisable et ressources réelles. Ne jamais inventer les mesures.
