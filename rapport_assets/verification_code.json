@@ -1,0 +1,22 @@
+[
+  {
+    "texte": "Kayak",
+    "attendu": true,
+    "obtenu": true
+  },
+  {
+    "texte": "Esope reste ici et se repose",
+    "attendu": true,
+    "obtenu": true
+  },
+  {
+    "texte": "Bonjour",
+    "attendu": false,
+    "obtenu": false
+  },
+  {
+    "texte": "Madame, je suis une letrine.",
+    "attendu": true,
+    "obtenu": false
+  }
+]
