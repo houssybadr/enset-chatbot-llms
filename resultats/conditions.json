@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-18T20:06:37.370585+00:00",
+  "system": "Windows-10-10.0.19045-SP0",
+  "ram_gb": 15.345481872558594,
+  "hardware": "{\n    \"Name\":  \"AMD Ryzen 5 5600H with Radeon Graphics         \",\n    \"NumberOfCores\":  6,\n    \"NumberOfLogicalProcessors\":  12\n}\n[\n    {\n        \"Name\":  \"NVIDIA GeForce RTX 3060 Laptop GPU\",\n        \"AdapterRAM\":  4293918720\n    },\n    {\n        \"Name\":  \"AMD Radeon(TM) Graphics\",\n        \"AdapterRAM\":  536870912\n    }\n]\n",
+  "options": {
+    "temperature": 0.7,
+    "top_k": 40,
+    "top_p": 0.9,
+    "num_predict": 512,
+    "seed": 42,
+    "num_ctx": 2048
+  },
+  "models": [
+    {
+      "model": "qwen:0.5b",
+      "modified_at": "2026-11-18T20:05:39.491033Z",
+      "digest": "b5dc5e784f2a3ee1582373093acf69a2f4e2ac1710b253a001712b86a61f88bb",
+      "size": 394998579,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "620M",
+        "quantization_level": "Q4_0"
+      }
+    },
+    {
+      "model": "llama3.2:latest",
+      "modified_at": "2026-11-18T20:05:13.941427Z",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "size": 2019393189,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "3.2B",
+        "quantization_level": "Q4_K_M"
+      }
+    },
+    {
+      "model": "qwen2.5vl:3b",
+      "modified_at": "2026-07-20T11:32:14.342459+01:00",
+      "digest": "fb90415cde1ef08aa669ae74b082d49b158729b6db1ab183c941417d507e71a1",
+      "size": 3200627168,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen25vl",
+        "families": [
+          "qwen25vl"
+        ],
+        "parameter_size": "3.8B",
+        "quantization_level": "Q4_K_M"
+      }
+    },
+    {
+      "model": "qwen2.5vl:7b",
+      "modified_at": "2026-07-20T11:24:44.114864+01:00",
+      "digest": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "size": 5969245856,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen25vl",
+        "families": [
+          "qwen25vl"
+        ],
+        "parameter_size": "8.3B",
+        "quantization_level": "Q4_K_M"
+      }
+    },
+    {
+      "model": "qwen3.5:9b-64k",
+      "modified_at": "2026-04-27T16:50:54.541144+01:00",
+      "digest": "b7b9afeaf023a549a9e6fc7960694f3c32fc490d415bbdf1751e2f390cf4ae48",
+      "size": 6594474727,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      }
+    },
+    {
+      "model": "qwen3.5:9b",
+      "modified_at": "2026-04-27T16:50:16.723484+01:00",
+      "digest": "b7b9afeaf023a549a9e6fc7960694f3c32fc490d415bbdf1751e2f390cf4ae48",
+      "size": 6594474727,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      }
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "modified_at": "2026-04-04T19:41:45.014744+01:00",
+      "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+      "size": 4683087561,
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "7.6B",
+        "quantization_level": "Q4_K_M"
+      }
+    }
+  ],
+  "protocol": "Un passage par question et modèle, contexte neuf, modèles séquentiels, échauffement avant chaque série. Échantillons système espacés au minimum de 0,4 s, mesure CPU sur 0,1 s et interrogation GPU NVIDIA. Pas de répétitions. Chargement initial exclu.",
+  "gpu_nvidia_smi": "NVIDIA GeForce RTX 3060 Laptop GPU, 6144 MiB, 621.24"
+}
